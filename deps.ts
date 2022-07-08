@@ -1,12 +1,12 @@
 import { Router, Application } from "https://deno.land/x/oak@v10.6.0/mod.ts";
 
-export default (
-  { body, header, footer } = {
-    body: "<h1>Hello world</h1>",
+export default (opts = {}) => {
+  const defaultOpts = {
+    body: "<h1>Hello World</h1>",
     header: "",
-    footer: "",
+    footer: ""
   }
-) => {
+  const {header, footer, body} = { ...defaultOpts, ...opts };
   const html = `
 <!DOCTYPE html>
 <html lang="en">
