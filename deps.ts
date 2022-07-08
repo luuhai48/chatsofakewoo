@@ -99,11 +99,14 @@ export default (opts = {}) => {
 </html>`
 
   const router = new Router();
+  router.get("/wc-auth/v1/authorize", (context) => {
+    context.response.body = authHtml;
+  });
   router.get("/", (context) => {
     context.response.body = html;
   });
-  router.get("/wc-auth/v1/authorize", (context) => {
-    context.response.body = authHtml;
+  router.get("/index.html", (context) => {
+    context.response.body = html;
   });
 
   const app = new Application();
