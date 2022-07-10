@@ -1,4 +1,5 @@
-import { Router, Application } from "https://deno.land/x/oak@v10.6.0/mod.ts";
+import { serve } from "https://deno.land/std/http/mod.ts";
+import { Router } from "./router.ts";
 
 const generateHTML = (opts = {}) => {
   const defaultOpts = {
@@ -23,6 +24,12 @@ const generateHTML = (opts = {}) => {
     </body>
   </html>`;
 };
+const response = (html: string) =>
+  new Response(html, {
+    headers: {
+      "Content-Type": "text/html",
+    },
+  });
 
 export default (opts = {}) => {
   const defaultHtml = generateHTML(opts);
@@ -76,23 +83,12 @@ export default (opts = {}) => {
   });
 
   const router = new Router();
-  router.get("/wc-auth/v1/authorize", (context) => {
-    context.response.body = authHtml;
-  });
-  router.get("/", (context) => {
-    context.response.body = defaultHtml;
-  });
-  router.get("/:anythingelse", (context) => {
-    context.response.body = defaultHtml;
-  });
+  router.add("GET", "/wc-auth/v1/authorize", () => response(authHtml));
+  router.add("GET", "/", () => response(defaultHtml));
+  router.add("GET", "/:anythingelse", () => response(defaultHtml));
 
-  const app = new Application();
-  app.use(router.routes());
-  app.use(router.allowedMethods());
-
-  app.addEventListener("listen", ({ port }) => {
-    console.log(`Listening on: http://localhost:${port}`);
-  });
-
-  return app;
+  return {
+    listen: ({ port } = { port: 8000 }) =>
+      serve((req: Request) => router.route(req), { port }),
+  };
 };
